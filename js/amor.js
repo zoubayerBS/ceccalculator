@@ -5,7 +5,7 @@ function addSegment() {
   row.innerHTML = `
     <div class="flex-[1.5] min-w-0">
       <label class="text-[0.65rem] text-medical-text2 uppercase tracking-wider font-medium">Type</label>
-      <select class="seg-type w-full border border-medical-inputBd rounded px-2 py-1.5 text-[0.85rem] font-condensed font-medium outline-none min-h-[36px]" style="-webkit-appearance:none;appearance:none;background-color:#F8FAFC;background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E&quot;);background-repeat:no-repeat;background-position:right 8px center;background-size:14px;padding-right:30px;cursor:pointer">
+      <select class="seg-type w-full border border-medical-inputBd rounded px-2 py-1.5 text-[0.85rem] font-condensed font-medium outline-none min-h-[36px]">
         <option>Oxygénateur</option><option>Réservoir veineux</option><option>Tubulures artérielles</option><option>Tubulures veineuses</option><option>Filtre artériel</option><option>Cardiotomie</option><option>Autre</option>
       </select>
     </div>
