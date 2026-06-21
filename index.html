@@ -50,7 +50,7 @@ tailwind.config = {
     <div class="p-2.5">
       <div class="grid grid-cols-2 gap-x-2 gap-y-1.5 mb-2">
         <div><label class="text-[0.65rem] text-medical-text2 uppercase tracking-wider font-medium">Nom</label><input type="text" id="p-nom" placeholder="—" class="w-full bg-medical-input border border-medical-inputBd rounded px-2 py-1.5 text-[0.85rem] font-condensed font-medium outline-none focus:border-medical-accent min-h-[36px]"></div>
-        <div><label class="text-[0.65rem] text-medical-text2 uppercase tracking-wider font-medium">Sexe</label><select id="p-sexe" class="w-full border border-medical-inputBd rounded px-2 py-1.5 text-[0.85rem] font-condensed font-medium outline-none min-h-[36px] bg-medical-input"><option value="M">M</option><option value="F">F</option></select></div>
+        <div><label class="text-[0.65rem] text-medical-text2 uppercase tracking-wider font-medium">Sexe</label><select id="p-sexe" class="w-full border border-medical-inputBd rounded px-2 py-1.5 text-[0.85rem] font-condensed font-medium outline-none min-h-[36px]"><option value="M">M</option><option value="F">F</option></select></div>
         <div><label class="text-[0.65rem] text-medical-text2 uppercase tracking-wider font-medium">Poids <span class="font-normal text-medical-inputBd">kg</span></label><input type="number" id="p-poids" value="70" min="3" max="200" step="0.1" class="w-full bg-medical-input border border-medical-inputBd rounded px-2 py-1.5 text-[0.85rem] font-condensed font-medium outline-none focus:border-medical-accent min-h-[36px]"></div>
         <div><label class="text-[0.65rem] text-medical-text2 uppercase tracking-wider font-medium">Taille <span class="font-normal text-medical-inputBd">cm</span></label><input type="number" id="p-taille" value="170" min="50" max="220" class="w-full bg-medical-input border border-medical-inputBd rounded px-2 py-1.5 text-[0.85rem] font-condensed font-medium outline-none focus:border-medical-accent min-h-[36px]"></div>
         <div><label class="text-[0.65rem] text-medical-text2 uppercase tracking-wider font-medium">Âge <span class="font-normal text-medical-inputBd">ans</span></label><input type="number" id="p-age" value="65" min="0" max="120" class="w-full bg-medical-input border border-medical-inputBd rounded px-2 py-1.5 text-[0.85rem] font-condensed font-medium outline-none focus:border-medical-accent min-h-[36px]"></div>
@@ -607,18 +607,24 @@ if ('serviceWorker' in navigator) {
 <script src="js/cardio.js"></script>
 <script src="js/oxy.js"></script>
 <script>
-// Style selects AFTER Tailwind CDN to override generated styles
 document.addEventListener('DOMContentLoaded', () => {
-  const chevronSvg = "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E\")";
-  function styleSelects() {
-    document.querySelectorAll('select').forEach(s => {
-      s.style.cssText = '-webkit-appearance:none;appearance:none;background-color:#F8FAFC;background-image:' + chevronSvg + ';background-repeat:no-repeat;background-position:right 8px center;background-size:14px;padding-right:30px;cursor:pointer';
-    });
+  const svg = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E";
+  function styleSelect(el) {
+    el.style.setProperty('-webkit-appearance', 'none', 'important');
+    el.style.setProperty('appearance', 'none', 'important');
+    el.style.setProperty('background-color', '#F8FAFC', 'important');
+    el.style.setProperty('background-image', 'url("' + svg + '")', 'important');
+    el.style.setProperty('background-repeat', 'no-repeat', 'important');
+    el.style.setProperty('background-position', 'right 8px center', 'important');
+    el.style.setProperty('background-size', '14px', 'important');
+    el.style.setProperty('padding-right', '30px', 'important');
+    el.style.setProperty('cursor', 'pointer', 'important');
   }
-  styleSelects();
-  // Re-apply when views switch (dynamic selects may appear)
-  const observer = new MutationObserver(styleSelects);
-  observer.observe(document.body, { childList: true, subtree: true });
+  function styleAllSelects() {
+    document.querySelectorAll('select').forEach(styleSelect);
+  }
+  styleAllSelects();
+  new MutationObserver(styleAllSelects).observe(document.body, {childList:true, subtree:true});
 });
 </script>
 
