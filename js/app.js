@@ -124,7 +124,8 @@ function switchView(btn) {
   const viewId = btn.dataset.view;
   document.getElementById(viewId)?.classList.add('active');
   btn.classList.add('active');
-  const idx = Array.from(btn.parentElement.children).indexOf(btn);
+  const btns = Array.from(btn.parentElement.querySelectorAll('.nav-btn'));
+  const idx = btns.indexOf(btn);
   const indicator = document.getElementById('nav-indicator');
   if (indicator) indicator.style.left = (idx * 20) + '%';
   window.scrollTo(0, 0);
