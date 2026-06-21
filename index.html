@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#0B4F6C">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>CEC Calculator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        medical: { primary:'#0B4F6C', accent:'#00B4D8', surface:'#F0F4F8', card:'#FFFFFF', border:'#E2E8F0', danger:'#DC2626', warning:'#D97706', success:'#059669', text:'#1E293B', text2:'#64748B', input:'#F8FAFC', inputBd:'#E2E8F0' }
+      },
+      fontFamily: { barlow:['Barlow','system-ui','sans-serif'], condensed:['Barlow Condensed','sans-serif'] }
+    }
+  }
+}
+</script>
+<link rel="stylesheet" href="css/style.css">
+<link rel="manifest" href="data:application/json;charset=utf-8,%7B%22name%22%3A%22CEC%20Calculator%22%2C%22short_name%22%3A%22CEC%22%2C%22description%22%3A%22Calculateur%20de%20circulation%20extracorporelle%22%2C%22start_url%22%3A%22.%2F%22%2C%22display%22%3A%22standalone%22%2C%22orientation%22%3A%22portrait%22%2C%22background_color%22%3A%22%23F0F4F8%22%2C%22theme_color%22%3A%22%230B4F6C%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%253Csvg%2520xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%2520viewBox%3D%270%25200%2520192%2520192%27%253E%253Crect%2520width%3D%27192%27%2520height%3D%27192%27%2520rx%3D%2720%27%2520fill%3D%27%25230B4F6C%27%2F%253E%253Ctext%2520x%3D%2796%27%2520y%3D%27120%27%2520text-anchor%3D%27middle%27%2520font-size%3D%2780%27%2520fill%3D%27white%27%253E%E2%9D%A4%253C%2Ftext%253E%253C%2Fsvg%253E%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%2C%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%253Csvg%2520xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%2520viewBox%3D%270%25200%2520512%2520512%27%253E%253Crect%2520width%3D%27512%27%2520height%3D%27512%27%2520rx%3D%2740%27%2520fill%3D%27%25230B4F6C%27%2F%253E%253Ctext%2520x%3D%27256%27%2520y%3D%27320%27%2520text-anchor%3D%27middle%27%2520font-size%3D%27210%27%2520fill%3D%27white%27%253E%E2%9D%A4%253C%2Ftext%253E%253C%2Fsvg%253E%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D">
+</head>
+<body class="bg-medical-surface text-medical-text font-barlow antialiased">
+
+<!-- HEADER -->
+<header class="fixed top-0 inset-x-0 z-50 bg-medical-primary text-white flex items-center gap-2 px-3 shadow-md" style="padding:max(8px,env(safe-area-inset-top)) 12px 8px">
+  <i class="ti ti-heart-heart text-lg opacity-90"></i>
+  <h1 class="flex-1 text-[0.85rem] font-semibold tracking-wide">CEC Calc</h1>
+  <button class="text-white/70 text-[0.7rem] min-h-[28px] px-2 rounded hover:bg-white/10" onclick="clearPatient()"><i class="ti ti-trash text-sm"></i></button>
+</header>
+
+<main class="px-3 pb-20 pt-1">
+
+<!-- ==================== ACCUEIL ==================== -->
+<div class="view active flex flex-col justify-center min-h-[calc(100dvh-120px)]" id="view-accueil">
+
+  <!-- Patient Compact Card -->
+  <div class="bg-white rounded-xl border border-medical-border shadow-sm mb-2.5 overflow-hidden">
+    <div class="bg-gradient-to-r from-medical-primary to-[#0d6e8a] px-3 py-2 flex items-center gap-2">
+      <i class="ti ti-user text-white/80 text-sm"></i>
+      <span class="text-white text-[0.8rem] font-semibold flex-1">Profil Patient</span>
+      <button class="text-white/70 text-[0.65rem] bg-white/15 px-2 py-0.5 rounded-full" onclick="savePatient()"><i class="ti ti-check text-xs"></i> OK</button>
+    </div>
+    <div class="p-2.5">
+      <div class="grid grid-cols-2 gap-x-2 gap-y-1.5 mb-2">
+        <div><label class="text-[0.65rem] text-medical-text2 uppercase tracking-wider font-medium">Nom</label><input type="text" id="p-nom" placeholder="—" class="w-full bg-medical-input border border-medical-inputBd rounded px-2 py-1.5 text-[0.85rem] font-condensed font-medium outline-none focus:border-medical-accent min-h-[36px]"></div>
+        <div><label class="text-[0.65rem] text-medical-text2 uppercase tracking-wider font-medium">Sexe</label><select id="p-sexe" class="w-full bg-medical-input border border-medical-inputBd rounded px-2 py-1.5 text-[0.85rem] font-condensed font-medium outline-none min-h-[36px]"><option value="M">M</option><option value="F">F</option></select></div>
+        <div><label class="text-[0.65rem] text-medical-text2 uppercase tracking-wider font-medium">Poids <span class="font-normal text-medical-inputBd">kg</span></label><input type="number" id="p-poids" value="70" min="3" max="200" step="0.1" class="w-full bg-medical-input border border-medical-inputBd rounded px-2 py-1.5 text-[0.85rem] font-condensed font-medium outline-none focus:border-medical-accent min-h-[36px]"></div>
+        <div><label class="text-[0.65rem] text-medical-text2 uppercase tracking-wider font-medium">Taille <span class="font-normal text-medical-inputBd">cm</span></label><input type="number" id="p-taille" value="170" min="50" max="220" class="w-full bg-medical-input border border-medical-inputBd rounded px-2 py-1.5 text-[0.85rem] font-condensed font-medium outline-none focus:border-medical-accent min-h-[36px]"></div>
+        <div><label class="text-[0.65rem] text-medical-text2 uppercase tracking-wider font-medium">Âge <span class="font-normal text-medical-inputBd">ans</span></label><input type="number" id="p-age" value="65" min="0" max="120" class="w-full bg-medical-input border border-medical-inputBd rounded px-2 py-1.5 text-[0.85rem] font-condensed font-medium outline-none focus:border-medical-accent min-h-[36px]"></div>
+        <div><label class="text-[0.65rem] text-medical-text2 uppercase tracking-wider font-medium">Hb <span class="font-normal text-medical-inputBd">g/dL</span></label><input type="number" id="p-hb" value="12" min="3" max="20" step="0.1" class="w-full bg-medical-input border border-medical-inputBd rounded px-2 py-1.5 text-[0.85rem] font-condensed font-medium outline-none focus:border-medical-accent min-h-[36px]"></div>
+        <div><label class="text-[0.65rem] text-medical-text2 uppercase tracking-wider font-medium">Hct <span class="font-normal text-medical-inputBd">%</span></label><input type="number" id="p-hct" value="36" min="10" max="60" step="0.1" class="w-full bg-medical-input border border-medical-inputBd rounded px-2 py-1.5 text-[0.85rem] font-condensed font-medium outline-none focus:border-medical-accent min-h-[36px]"></div>
+      </div>
+      <!-- Resultats inline -->
+      <div class="bg-medical-input rounded-lg p-2 grid grid-cols-3 gap-1.5 text-center border border-medical-border/50">
+        <div><div class="font-condensed text-[0.95rem] font-bold text-medical-primary leading-tight" id="r-sc">--</div><div class="text-[0.55rem] text-medical-text2 leading-tight">SC DuBois <span class="text-medical-inputBd">m²</span></div></div>
+        <div><div class="font-condensed text-[0.95rem] font-bold text-medical-primary leading-tight" id="r-bsa">--</div><div class="text-[0.55rem] text-medical-text2 leading-tight">BSA <span class="text-medical-inputBd">m²</span></div></div>
+        <div><div class="font-condensed text-[0.95rem] font-bold text-medical-primary leading-tight" id="r-imc">--</div><div class="text-[0.55rem] text-medical-text2 leading-tight">IMC <span class="text-medical-inputBd">kg/m²</span></div></div>
+        <div><div class="font-condensed text-[0.95rem] font-bold text-medical-accent leading-tight" id="r-debit">--</div><div class="text-[0.55rem] text-medical-text2 leading-tight">Débit <span class="text-medical-inputBd">L/min</span></div></div>
+        <div class="col-span-2"><div class="font-condensed text-[0.95rem] font-bold text-medical-accent leading-tight" id="r-ebv">--</div><div class="text-[0.55rem] text-medical-text2 leading-tight">VST <span class="text-medical-inputBd">mL</span></div></div>
+      </div>
+      <button class="w-full bg-medical-input text-medical-primary border border-medical-border rounded-lg px-2 py-1.5 text-[0.75rem] font-semibold cursor-pointer min-h-[34px] mt-2 active:bg-gray-100" onclick="propagatePatient()"><i class="ti ti-copy text-xs"></i> Propager aux sections</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== HEMODYNAMIQUE ==================== -->
+<div class="view" id="view-hemo">
+  <p class="text-medical-text2 text-[0.7rem] font-bold uppercase tracking-widest mb-2 text-center">Hémodynamique</p>
+
+  <!-- SC -->
+  <div class="bg-white rounded-xl border border-medical-border shadow-sm mb-2 overflow-hidden">
+    <div class="px-3 py-1.5 bg-medical-primary/5 border-b border-medical-border/50 flex items-center gap-1.5">
+      <i class="ti ti-ruler-measure text-medical-accent text-sm"></i>
+      <span class="text-[0.78rem] font-semibold text-medical-primary">Surface Corporelle</span>
+      <span class="ml-auto text-[0.6rem] text-medical-text2 bg-medical-input px-1.5 py-0.5 rounded-full">DuBois / Mosteller</span>
+    </div>
+    <div class="p-2.5">
+      <div class="grid grid-cols-2 gap-1.5 mb-2">
+        <div><label class="text-[0.65rem] text-medical-text2 uppercase tracking-wider font-medium">Poids <span class="font-normal text-medical-inputBd">kg</span></label><input type="number" id="h-poids" value="70" step="0.1" class="w-full bg-medical-input border border-medical-inputBd rounded px-2 py-1.5 text-[0.85rem] font-condensed font-medium outline-none focus:border-medical-accent min-h-[36px]"></div>
+        <div><label class="text-[0.65rem] text-medical-text2 uppercase tracking-wider font-medium">Taille <span class="font-normal text-medical-inputBd">cm</span></label><input type="number" id="h-taille" value="170" class="w-full bg-medical-input border border-medical-inputBd rounded px-2 py-1.5 text-[0.85rem] font-condensed font-medium outline-none focus:border-medical-accent min-h-[36px]"></div>
+      </div>
+      <button class="w-full bg-medical-primary text-white border-none rounded-lg px-2 py-1.5 text-[0.8rem] font-semibold cursor-pointer min-h-[36px] mb-2 active:bg-[#083d54]" onclick="calcSC()">Calculer</button>
+      <div class="grid grid-cols-2 gap-1">
+        <div class="bg-medical-input rounded-lg py-1.5 px-1 text-center border border-medical-border/30"><div class="font-condensed text-[1rem] font-bold text-medical-primary" id="r-sc-dub">--</div><div class="text-[0.55rem] text-medical-text2">DuBois <span class="text-medical-inputBd">m²</span></div></div>
+        <div class="bg-medical-input rounded-lg py-1.5 px-1 text-center border border-medical-border/30"><div class="font-condensed text-[1rem] font-bold text-medical-primary" id="r-sc-mos">--</div><div class="text-[0.55rem] text-medical-text2">Mosteller <span class="text-medical-inputBd">m²</span></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Débit -->
+  <div class="bg-white rounded-xl border border-medical-border shadow-sm mb-2 overflow-hidden">
+    <div class="px-3 py-1.5 bg-medical-primary/5 border-b border-medical-border/50 flex items-center gap-1.5">
+      <i class="ti ti-engine text-medical-accent text-sm"></i>
+      <span class="text-[0.78rem] font-semibold text-medical-primary">Débit de Pompe</span>
+      <span class="ml-auto text-[0.6rem] text-medical-text2 bg-medical-input px-1.5 py-0.5 rounded-full">Q = IPC × SC</span>
+    </div>
+    <div class="p-2.5">
+      <div class="mb-1.5">
+        <div class="flex items-center justify-between mb-0.5">
+          <label class="text-[0.65rem] text-medical-text2 uppercase tracking-wider font-medium">IPC <span class="font-normal text-medical-inputBd">L/min/m²</span></label>
+          <span class="font-condensed font-bold text-medical-accent text-[0.85rem]" id="rv-ipc">2.4</span>
+        </div>
+        <input type="range" id="h-ipc" min="1.8" max="3.0" step="0.1" value="2.4" oninput="document.getElementById('rv-ipc').textContent=this.value" class="w-full">
+      </div>
+      <div class="grid grid-cols-2 gap-1.5 mb-2">
+        <div><label class="text-[0.65rem] text-medical-text2 uppercase tracking-wider font-medium">SC <span class="font-normal text-medical-inputBd">m²</span></label><input type="number" id="h-sc-debit" value="1.84" step="0.01" class="w-full bg-medical-input border border-medical-inputBd rounded px-2 py-1.5 text-[0.85rem] font-condensed font-medium outline-none focus:border-medical-accent min-h-[36px]"></div>
+      </div>
+      <button class="w-full bg-medical-primary text-white border-none rounded-lg px-2 py-1.5 text-[0.8rem] font-semibold cursor-pointer min-h-[36px] mb-2 active:bg-[#083d54]" onclick="calcDebit()">Calculer</button>
+      <div class="grid grid-cols-3 gap-1 text-center">
+        <div class="bg-medical-input rounded-lg py-1 px-0.5 border border-medical-border/30"><div class="font-condensed text-[0.9rem] font-bold text-medical-primary" id="r-q-cible">--</div><div class="text-[0.5rem] text-medical-text2">Q cible</div></div>
+        <div class="bg-medical-input rounded-lg py-1 px-0.5 border border-medical-border/30"><div class="font-condensed text-[0.9rem] font-bold text-medical-primary" id="r-q-min">--</div><div class="text-[0.5rem] text-medical-text2">Q min</div></div>
+        <div class="bg-medical-accent/10 rounded-lg py-1 px-0.5 border border-medical-accent/20"><div class="font-condensed text-[0.9rem] font-bold text-medical-accent" id="r-q-max">--</div><div class="text-[0.5rem] text-medical-text2">Q max</div></div>
+      </div>
+      <div class="alert-box hidden rounded py-1.5 px-2 text-[0.7rem] font-medium mt-1.5 border-l-3" id="alert-debit"></div>
+    </div>
+  </div>
+
+  <!-- DO2I -->
+  <div class="bg-white rounded-xl border border-medical-border shadow-sm mb-2 overflow-hidden">
+    <div class="px-3 py-1.5 bg-medical-primary/5 border-b border-medical-border/50 flex items-center gap-1.5">
+      <i class="ti ti-lungs text-medical-accent text-sm"></i>
+      <span class="text-[0.78rem] font-semibold text-medical-primary">DO₂I</span>
+      <span class="ml-auto text-[0.6rem] text-medical-text2 bg-medical-input px-1.5 py-0.5 rounded-full">Transport O₂</span>
+    </div>
+    <div class="p-2.5">
+      <div class="grid grid-cols-3 gap-1.5 mb-2">
+        <div><label class="text-[0.65rem] text-medical-text2 uppercase tracking-wider font-medium">CI <span class="font-normal text-medical-inputBd">L/min/m²</span></label><input type="number" id="h-ci" value="2.4" step="0.1" class="w-full bg-medical-input border border-medical-inputBd rounded px-2 py-1.5 text-[0.85rem] font-condensed font-medium outline-none focus:border-medical-accent min-h-[36px]"></div>
+        <div><label class="text-[0.65rem] text-medical-text2 uppercase tracking-wider font-medium">Hb <span class="font-normal text-medical-inputBd">g/dL</span></label><input type="number" id="h-hb-do2" value="12" step="0.1" class="w-full bg-medical-input border border-medical-inputBd rounded px-2 py-1.5 text-[0.85rem] font-condensed font-medium outline-none focus:border-medical-accent min-h-[36px]"></div>
+        <div><label class="text-[0.65rem] text-medical-text2 uppercase tracking-wider font-medium">SaO₂ <span class="font-normal text-medical-inputBd">%</span></label><input type="number" id="h-sao2" value="100" min="50" max="100" class="w-full bg-medical-input border border-medical-inputBd rounded px-2 py-1.5 text-[0.85rem] font-condensed font-medium outline-none focus:border-medical-accent min-h-[36px]"></div>
+      </div>
+      <button class="w-full bg-medical-primary text-white border-none rounded-lg px-2 py-1.5 text-[0.8rem] font-semibold cursor-pointer min-h-[36px] mb-2 active:bg-[#083d54]" onclick="calcDO2I()">Calculer</button>
+      <div class="bg-medical-accent/10 rounded-lg py-2 text-center border border-medical-accent/20 mb-1">
+        <div class="font-condensed text-[1.4rem] font-bold text-medical-accent leading-none" id="r-do2i">--</div>
+        <div class="text-[0.6rem] text-medical-text2">mL/min/m² — <span class="font-medium">Normale: 520–720</span></div>
+      </div>
+      <div class="alert-box hidden rounded py-1.5 px-2 text-[0.7rem] font-medium border-l-3" id="alert-do2i"></div>
+    </div>
+  </div>
+
+  <!-- RVS -->
+  <div class="bg-white rounded-xl border border-medical-border shadow-sm mb-2 overflow-hidden">
+    <div class="px-3 py-1.5 bg-medical-primary/5 border-b border-medical-border/50 flex items-center gap-1.5">
+      <i class="ti ti-trending-up text-medical-accent text-sm"></i>
+      <span class="text-[0.78rem] font-semibold text-medical-primary">Résistances Vasculaires</span>
+      <span class="ml-auto text-[0.6rem] text-medical-text2 bg-medical-input px-1.5 py-0.5 rounded-full">RVS</span>
+    </div>
+    <div class="p-2.5">
+      <div class="grid grid-cols-3 gap-1.5 mb-2">
+        <div><label class="text-[0.65rem] text-medical-text2 uppercase tracking-wider font-medium">PAM <span class="font-normal text-medical-inputBd">mmHg</span></label><input type="number" id="h-pam" value="65" class="w-full bg-medical-input border border-medical-inputBd rounded px-2 py-1.5 text-[0.85rem] font-condensed font-medium outline-none focus:border-medical-accent min-h-[36px]"></div>
+        <div><label class="text-[0.65rem] text-medical-text2 uppercase tracking-wider font-medium">POD <span class="font-normal text-medical-inputBd">mmHg</span></label><input type="number" id="h-pod" value="10" class="w-full bg-medical-input border border-medical-inputBd rounded px-2 py-1.5 text-[0.85rem] font-condensed font-medium outline-none focus:border-medical-accent min-h-[36px]"></div>
+        <div><label class="text-[0.65rem] text-medical-text2 uppercase tracking-wider font-medium">Débit <span class="font-normal text-medical-inputBd">L/min</span></label><input type="number" id="h-dc" value="5" step="0.1" class="w-full bg-medical-input border border-medical-inputBd rounded px-2 py-1.5 text-[0.85rem] font-condensed font-medium outline-none focus:border-medical-accent min-h-[36px]"></div>
+      </div>
+      <button class="w-full bg-medical-primary text-white border-none rounded-lg px-2 py-1.5 text-[0.8rem] font-semibold cursor-pointer min-h-[36px] mb-2 active:bg-[#083d54]" onclick="calcRVS()">Calculer</button>
+      <div class="bg-medical-accent/10 rounded-lg py-2 text-center border border-medical-accent/20 mb-1">
+        <div class="font-condensed text-[1.4rem] font-bold text-medical-accent leading-none" id="r-rvs">--</div>
+        <div class="text-[0.6rem] text-medical-text2">dynes·s/cm⁵ — <span class="font-medium">Normale: 900–1400</span></div>
+      </div>
+      <div class="alert-box hidden rounded py-1.5 px-2 text-[0.7rem] font-medium border-l-3" id="alert-rvs"></div>
+    </div>
+  </div>
+
+  <!-- PPC -->
+  <div class="bg-white rounded-xl border border-medical-border shadow-sm mb-2 overflow-hidden">
+    <div class="px-3 py-1.5 bg-medical-primary/5 border-b border-medical-border/50 flex items-center gap-1.5">
+      <i class="ti ti-stethoscope text-medical-accent text-sm"></i>
+      <span class="text-[0.78rem] font-semibold text-medical-primary">PPC</span>
+      <span class="ml-auto text-[0.6rem] text-medical-text2 bg-medical-input px-1.5 py-0.5 rounded-full">Perfusion Cérébrale</span>
+    </div>
+    <div class="p-2.5">
+      <div class="grid grid-cols-2 gap-1.5 mb-2">
+        <div><label class="text-[0.65rem] text-medical-text2 uppercase tracking-wider font-medium">PAM <span class="font-normal text-medical-inputBd">mmHg</span></label><input type="number" id="h-pam2" value="65" class="w-full bg-medical-input border border-medical-inputBd rounded px-2 py-1.5 text-[0.85rem] font-condensed font-medium outline-none focus:border-medical-accent min-h-[36px]"></div>
+        <div><label class="text-[0.65rem] text-medical-text2 uppercase tracking-wider font-medium">PVC <span class="font-normal text-medical-inputBd">mmHg</span></label><input type="number" id="h-pvc" value="5" class="w-full bg-medical-input border border-medical-inputBd rounded px-2 py-1.5 text-[0.85rem] font-condensed font-medium outline-none focus:border-medical-accent min-h-[36px]"></div>
+      </div>
+      <button class="w-full bg-medical-primary text-white border-none rounded-lg px-2 py-1.5 text-[0.8rem] font-semibold cursor-pointer min-h-[36px] mb-2 active:bg-[#083d54]" onclick="calcPPC()">Calculer</button>
+      <div class="bg-medical-accent/10 rounded-lg py-2 text-center border border-medical-accent/20 mb-1">
+        <div class="font-condensed text-[1.4rem] font-bold text-medical-accent leading-none" id="r-ppc">--</div>
+        <div class="text-[0.6rem] text-medical-text2">mmHg — <span class="font-medium">Cible ≥ 50</span></div>
+      </div>
+      <div class="alert-box hidden rounded py-1.5 px-2 text-[0.7rem] font-medium border-l-3" id="alert-ppc"></div>
+    </div>
+  </div>
+
+  <!-- Réchauffement -->
+  <div class="bg-white rounded-xl border border-medical-border shadow-sm mb-2 overflow-hidden">
+    <div class="px-3 py-1.5 bg-medical-primary/5 border-b border-medical-border/50 flex items-center gap-1.5">
+      <i class="ti ti-thermometer text-medical-accent text-sm"></i>
+      <span class="text-[0.78rem] font-semibold text-medical-primary">Réchauffement</span>
+      <span class="ml-auto text-[0.6rem] text-medical-text2 bg-medical-input px-1.5 py-0.5 rounded-full">ΔT/min</span>
+    </div>
+    <div class="p-2.5">
+      <div class="grid grid-cols-2 gap-1.5 mb-2">
+        <div><label class="text-[0.65rem] text-medical-text2 uppercase tracking-wider font-medium">T actuelle <span class="font-normal text-medical-inputBd">°C</span></label><input type="number" id="h-t-act" value="28" step="0.1" class="w-full bg-medical-input border border-medical-inputBd rounded px-2 py-1.5 text-[0.85rem] font-condensed font-medium outline-none focus:border-medical-accent min-h-[36px]"></div>
+        <div><label class="text-[0.65rem] text-medical-text2 uppercase tracking-wider font-medium">T cible <span class="font-normal text-medical-inputBd">°C</span></label><input type="number" id="h-t-cible" value="37" step="0.1" class="w-full bg-medical-input border border-medical-inputBd rounded px-2 py-1.5 text-[0.85rem] font-condensed font-medium outline-none focus:border-medical-accent min-h-[36px]"></div>
+        <div><label class="text-[0.65rem] text-medical-text2 uppercase tracking-wider font-medium">Temps <span class="font-normal text-medical-inputBd">min</span></label><input type="number" id="h-temps" value="20" class="w-full bg-medical-input border border-medical-inputBd rounded px-2 py-1.5 text-[0.85rem] font-condensed font-medium outline-none focus:border-medical-accent min-h-[36px]"></div>
+        <div><label class="text-[0.65rem] text-medical-text2 uppercase tracking-wider font-medium">T naso <span class="font-normal text-medical-inputBd">°C</span></label><input type="number" id="h-t-naso" value="30" step="0.1" class="w-full bg-medical-input border border-medical-inputBd rounded px-2 py-1.5 text-[0.85rem] font-condensed font-medium outline-none focus:border-medical-accent min-h-[36px]"></div>
+      </div>
+      <button class="w-full bg-medical-primary text-white border-none rounded-lg px-2 py-1.5 text-[0.8rem] font-semibold cursor-pointer min-h-[36px] mb-2 active:bg-[#083d54]" onclick="calcRech()">Calculer</button>
+      <div class="bg-medical-accent/10 rounded-lg py-2 text-center border border-medical-accent/20 mb-1">
+        <div class="font-condensed text-[1.4rem] font-bold text-medical-accent leading-none" id="r-dtmin">--</div>
+        <div class="text-[0.6rem] text-medical-text2">°C/min — <span class="font-medium">Cible: 0.5–1.0</span></div>
+      </div>
+      <div class="alert-box hidden rounded py-1.5 px-2 text-[0.7rem] font-medium border-l-3" id="alert-rech"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== AMORCAGE ==================== -->
+<div class="view" id="view-amor">
+  <p class="text-medical-text2 text-[0.7rem] font-bold uppercase tracking-widest mb-2 text-center">Amorçage & Hémodilution</p>
+
+  <!-- Volume Amorçage -->
+  <div class="bg-white rounded-xl border border-medical-border shadow-sm mb-2 overflow-hidden">
+    <div class="px-3 py-1.5 bg-medical-primary/5 border-b border-medical-border/50 flex items-center gap-1.5">
+      <i class="ti ti-droplet text-medical-accent text-sm"></i>
+      <span class="text-[0.78rem] font-semibold text-medical-primary">Volume d'Amorçage</span>
+    </div>
+    <div class="p-2.5">
+      <div id="segments-list">
+        <div class="segment-row flex gap-1.5 items-end mb-1.5">
+          <div class="flex-[1.5] min-w-0"><label class="text-[0.65rem] text-medical-text2 uppercase tracking-wider font-medium">Type</label><select class="seg-type w-full bg-medical-input border border-medical-inputBd rounded px-2 py-1.5 text-[0.85rem] font-condensed font-medium outline-none min-h-[36px]"><option>Oxygénateur</option><option>Réservoir veineux</option><option>Tubulures artérielles</option><option>Tubulures veineuses</option><option>Filtre artériel</option><option>Cardiotomie</option><option>Autre</option></select></div>
+          <div class="flex-1 min-w-0"><label class="text-[0.65rem] text-medical-text2 uppercase tracking-wider font-medium">Vol <span class="font-normal text-medical-inputBd">mL</span></label><input type="number" class="seg-vol w-full bg-medical-input border border-medical-inputBd rounded px-2 py-1.5 text-[0.85rem] font-condensed font-medium outline-none min-h-[36px]" value="250"></div>
+          <button onclick="removeSegment(this)" title="Supprimer" class="seg-del">×</button>
+        </div>
+      </div>
+      <button class="bg-medical-accent text-white border-none rounded px-2 py-1 text-[0.7rem] font-semibold cursor-pointer mb-2 min-h-[32px]" onclick="addSegment()">+ Segment</button>
+      <div class="bg-medical-accent/10 rounded-lg py-2 text-center border border-medical-accent/20 mb-1">
+        <div class="font-condensed text-[1.4rem] font-bold text-medical-accent leading-none" id="r-vamor">--</div>
+        <div class="text-[0.6rem] text-medical-text2">mL total amorçage</div>
+      </div>
+      <button class="w-full bg-medical-primary text-white border-none rounded-lg px-2 py-1.5 text-[0.8rem] font-semibold cursor-pointer min-h-[36px] mb-1 active:bg-[#083d54]" onclick="calcAmorcTotal()">Calculer</button>
+    </div>
+  </div>
+
+  <!-- Hct Prédit -->
+  <div class="bg-white rounded-xl border border-medical-border shadow-sm mb-2 overflow-hidden">
+    <div class="px-3 py-1.5 bg-medical-primary/5 border-b border-medical-border/50 flex items-center gap-1.5">
+      <i class="ti ti-droplet-half text-medical-accent text-sm"></i>
+      <span class="text-[0.78rem] font-semibold text-medical-primary">Hématocrite Prédit</span>
+      <span class="ml-auto text-[0.6rem] text-medical-text2 bg-medical-input px-1.5 py-0.5 rounded-full">Hémodilution</span>
+    </div>
+    <div class="p-2.5">
+      <div class="grid grid-cols-2 gap-1.5 mb-2">
+        <div><label class="text-[0.65rem] text-medical-text2 uppercase tracking-wider font-medium">Hct <span class="font-normal text-medical-inputBd">%</span></label><input type="number" id="a-hct-pat" value="36" step="0.1" class="w-full bg-medical-input border border-medical-inputBd rounded px-2 py-1.5 text-[0.85rem] font-condensed font-medium outline-none focus:border-medical-accent min-h-[36px]"></div>
+        <div><label class="text-[0.65rem] text-medical-text2 uppercase tracking-wider font-medium">Poids <span class="font-normal text-medical-inputBd">kg</span></label><input type="number" id="a-poids-hct" value="70" step="0.1" class="w-full bg-medical-input border border-medical-inputBd rounded px-2 py-1.5 text-[0.85rem] font-condensed font-medium outline-none focus:border-medical-accent min-h-[36px]"></div>
+        <div><label class="text-[0.65rem] text-medical-text2 uppercase tracking-wider font-medium">Sexe</label><select id="a-sexe-hct" class="w-full bg-medical-input border border-medical-inputBd rounded px-2 py-1.5 text-[0.85rem] font-condensed font-medium outline-none min-h-[36px]"><option value="M">M</option><option value="F">F</option></select></div>
+        <div><label class="text-[0.65rem] text-medical-text2 uppercase tracking-wider font-medium">Vol. amorç. <span class="font-normal text-medical-inputBd">mL</span></label><input type="number" id="a-vamor" value="1500" class="w-full bg-medical-input border border-medical-inputBd rounded px-2 py-1.5 text-[0.85rem] font-condensed font-medium outline-none focus:border-medical-accent min-h-[36px]"></div>
+      </div>
+      <button class="w-full bg-medical-primary text-white border-none rounded-lg px-2 py-1.5 text-[0.8rem] font-semibold cursor-pointer min-h-[36px] mb-2 active:bg-[#083d54]" onclick="calcHctPredit()">Calculer</button>
+      <div class="grid grid-cols-2 gap-1 mb-1">
+        <div class="bg-medical-input rounded-lg py-1.5 px-1 text-center border border-medical-border/30"><div class="font-condensed text-[1rem] font-bold text-medical-primary" id="r-ebv-hct">--</div><div class="text-[0.55rem] text-medical-text2">EBV <span class="text-medical-inputBd">mL</span></div></div>
+        <div class="bg-medical-accent/10 rounded-lg py-1.5 px-1 text-center border border-medical-accent/20"><div class="font-condensed text-[1rem] font-bold text-medical-accent" id="r-hct-pred">--</div><div class="text-[0.55rem] text-medical-text2">Hct prédit <span class="text-medical-inputBd">%</span></div></div>
+      </div>
+      <div class="alert-box hidden rounded py-1.5 px-2 text-[0.7rem] font-medium border-l-3" id="alert-hct"></div>
+    </div>
+  </div>
+
+  <!-- CGR -->
+  <div class="bg-white rounded-xl border border-medical-border shadow-sm mb-2 overflow-hidden">
+    <div class="px-3 py-1.5 bg-medical-primary/5 border-b border-medical-border/50 flex items-center gap-1.5">
+      <i class="ti ti-blood-bag text-medical-accent text-sm"></i>
+      <span class="text-[0.78rem] font-semibold text-medical-primary">Volume CGR</span>
+      <span class="ml-auto text-[0.6rem] text-medical-text2 bg-medical-input px-1.5 py-0.5 rounded-full">Concentré Globulaire</span>
+    </div>
+    <div class="p-2.5">
+      <div class="grid grid-cols-2 gap-1.5 mb-2">
+        <div><label class="text-[0.65rem] text-medical-text2 uppercase tracking-wider font-medium">Hct cible <span class="font-normal text-medical-inputBd">%</span></label><input type="number" id="a-hct-cible" value="24" step="0.1" class="w-full bg-medical-input border border-medical-inputBd rounded px-2 py-1.5 text-[0.85rem] font-condensed font-medium outline-none focus:border-medical-accent min-h-[36px]"></div>
+        <div><label class="text-[0.65rem] text-medical-text2 uppercase tracking-wider font-medium">Hct actuel <span class="font-normal text-medical-inputBd">%</span></label><input type="number" id="a-hct-act" value="21" step="0.1" class="w-full bg-medical-input border border-medical-inputBd rounded px-2 py-1.5 text-[0.85rem] font-condensed font-medium outline-none focus:border-medical-accent min-h-[36px]"></div>
+        <div><label class="text-[0.65rem] text-medical-text2 uppercase tracking-wider font-medium">VST <span class="font-normal text-medical-inputBd">mL</span></label><input type="number" id="a-vst" value="6400" class="w-full bg-medical-input border border-medical-inputBd rounded px-2 py-1.5 text-[0.85rem] font-condensed font-medium outline-none focus:border-medical-accent min-h-[36px]"></div>
+        <div><label class="text-[0.65rem] text-medical-text2 uppercase tracking-wider font-medium">Hct CGR <span class="font-normal text-medical-inputBd">%</span></label><input type="number" id="a-hct-cgr" value="58" step="0.1" class="w-full bg-medical-input border border-medical-inputBd rounded px-2 py-1.5 text-[0.85rem] font-condensed font-medium outline-none focus:border-medical-accent min-h-[36px]"></div>
+      </div>
+      <button class="w-full bg-medical-primary text-white border-none rounded-lg px-2 py-1.5 text-[0.8rem] font-semibold cursor-pointer min-h-[36px] mb-2 active:bg-[#083d54]" onclick="calcCGR()">Calculer</button>
+      <div class="bg-medical-accent/10 rounded-lg py-2 text-center border border-medical-accent/20">
+        <div class="font-condensed text-[1.4rem] font-bold text-medical-accent leading-none" id="r-cgr">--</div>
+        <div class="text-[0.6rem] text-medical-text2">mL CGR à transfuser</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Osmolarité -->
+  <div class="bg-white rounded-xl border border-medical-border shadow-sm mb-2 overflow-hidden">
+    <div class="px-3 py-1.5 bg-medical-primary/5 border-b border-medical-border/50 flex items-center gap-1.5">
+      <i class="ti ti-test-pipe text-medical-accent text-sm"></i>
+      <span class="text-[0.78rem] font-semibold text-medical-primary">Osmolarité</span>
+      <span class="ml-auto text-[0.6rem] text-medical-text2 bg-medical-input px-1.5 py-0.5 rounded-full">mOsm/L</span>
+    </div>
+    <div class="p-2.5">
+      <div class="grid grid-cols-3 gap-1.5 mb-2">
+        <div><label class="text-[0.65rem] text-medical-text2 uppercase tracking-wider font-medium">Na <span class="font-normal text-medical-inputBd">mmol/L</span></label><input type="number" id="a-na" value="140" class="w-full bg-medical-input border border-medical-inputBd rounded px-2 py-1.5 text-[0.85rem] font-condensed font-medium outline-none focus:border-medical-accent min-h-[36px]"></div>
+        <div><label class="text-[0.65rem] text-medical-text2 uppercase tracking-wider font-medium">Glu <span class="font-normal text-medical-inputBd">g/L</span></label><input type="number" id="a-glucose" value="5" step="0.1" class="w-full bg-medical-input border border-medical-inputBd rounded px-2 py-1.5 text-[0.85rem] font-condensed font-medium outline-none focus:border-medical-accent min-h-[36px]"></div>
+        <div><label class="text-[0.65rem] text-medical-text2 uppercase tracking-wider font-medium">Urée <span class="font-normal text-medical-inputBd">mmol/L</span></label><input type="number" id="a-uree" value="5" step="0.1" class="w-full bg-medical-input border border-medical-inputBd rounded px-2 py-1.5 text-[0.85rem] font-condensed font-medium outline-none focus:border-medical-accent min-h-[36px]"></div>
+      </div>
+      <button class="w-full bg-medical-primary text-white border-none rounded-lg px-2 py-1.5 text-[0.8rem] font-semibold cursor-pointer min-h-[36px] mb-2 active:bg-[#083d54]" onclick="calcOsm()">Calculer</button>
+      <div class="bg-medical-accent/10 rounded-lg py-2 text-center border border-medical-accent/20 mb-1">
+        <div class="font-condensed text-[1.4rem] font-bold text-medical-accent leading-none" id="r-osm">--</div>
+        <div class="text-[0.6rem] text-medical-text2">mOsm/L — <span class="font-medium">Normale: 280–310</span></div>
+      </div>
+      <div class="alert-box hidden rounded py-1.5 px-2 text-[0.7rem] font-medium border-l-3" id="alert-osm"></div>
+    </div>
+  </div>
+
+  <!-- Héparine -->
+  <div class="bg-white rounded-xl border border-medical-border shadow-sm mb-2 overflow-hidden">
+    <div class="px-3 py-1.5 bg-medical-primary/5 border-b border-medical-border/50 flex items-center gap-1.5">
+      <i class="ti ti-syringe text-medical-accent text-sm"></i>
+      <span class="text-[0.78rem] font-semibold text-medical-primary">Dose Héparine</span>
+      <span class="ml-auto text-[0.6rem] text-medical-text2 bg-medical-input px-1.5 py-0.5 rounded-full">UI/kg</span>
+    </div>
+    <div class="p-2.5">
+      <div class="grid grid-cols-2 gap-1.5 mb-2">
+        <div><label class="text-[0.65rem] text-medical-text2 uppercase tracking-wider font-medium">Poids <span class="font-normal text-medical-inputBd">kg</span></label><input type="number" id="a-poids-hep" value="70" step="0.1" class="w-full bg-medical-input border border-medical-inputBd rounded px-2 py-1.5 text-[0.85rem] font-condensed font-medium outline-none focus:border-medical-accent min-h-[36px]"></div>
+        <div><label class="text-[0.65rem] text-medical-text2 uppercase tracking-wider font-medium">Protocole</label><select id="a-protocole" class="w-full bg-medical-input border border-medical-inputBd rounded px-2 py-1.5 text-[0.85rem] font-condensed font-medium outline-none min-h-[36px]"><option value="300">Standard 300</option><option value="400">Hépariné 400</option></select></div>
+      </div>
+      <button class="w-full bg-medical-primary text-white border-none rounded-lg px-2 py-1.5 text-[0.8rem] font-semibold cursor-pointer min-h-[36px] mb-2 active:bg-[#083d54]" onclick="calcHep()">Calculer</button>
+      <div class="grid grid-cols-2 gap-1 mb-1">
+        <div class="bg-medical-input rounded-lg py-1.5 px-1 text-center border border-medical-border/30"><div class="font-condensed text-[1rem] font-bold text-medical-primary" id="r-hep-min">--</div><div class="text-[0.55rem] text-medical-text2">Dose min <span class="text-medical-inputBd">UI</span></div></div>
+        <div class="bg-medical-input rounded-lg py-1.5 px-1 text-center border border-medical-border/30"><div class="font-condensed text-[1rem] font-bold text-medical-primary" id="r-hep-max">--</div><div class="text-[0.55rem] text-medical-text2">Dose max <span class="text-medical-inputBd">UI</span></div></div>
+      </div>
+      <div class="bg-medical-accent/10 rounded-lg py-1.5 text-center border border-medical-accent/20">
+        <div class="font-condensed text-[1.1rem] font-bold text-medical-accent leading-none" id="r-act">--</div>
+        <div class="text-[0.55rem] text-medical-text2">ACT cible — Std > 480s | Hép > 400s</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Protamine -->
+  <div class="bg-white rounded-xl border border-medical-border shadow-sm mb-2 overflow-hidden">
+    <div class="px-3 py-1.5 bg-medical-primary/5 border-b border-medical-border/50 flex items-center gap-1.5">
+      <i class="ti ti-pill text-medical-accent text-sm"></i>
+      <span class="text-[0.78rem] font-semibold text-medical-primary">Protamine</span>
+      <span class="ml-auto text-[0.6rem] text-medical-text2 bg-medical-input px-1.5 py-0.5 rounded-full">Neutralisation</span>
+    </div>
+    <div class="p-2.5">
+      <div class="mb-2"><label class="text-[0.65rem] text-medical-text2 uppercase tracking-wider font-medium">Dose héparine <span class="font-normal text-medical-inputBd">UI</span></label><input type="number" id="a-dose-hep" value="21000" class="w-full bg-medical-input border border-medical-inputBd rounded px-2 py-1.5 text-[0.85rem] font-condensed font-medium outline-none focus:border-medical-accent min-h-[36px]"></div>
+      <button class="w-full bg-medical-primary text-white border-none rounded-lg px-2 py-1.5 text-[0.8rem] font-semibold cursor-pointer min-h-[36px] mb-2 active:bg-[#083d54]" onclick="calcProt()">Calculer</button>
+      <div class="bg-medical-accent/10 rounded-lg py-2 text-center border border-medical-accent/20">
+        <div class="font-condensed text-[1.4rem] font-bold text-medical-accent leading-none" id="r-prot">--</div>
+        <div class="text-[0.6rem] text-medical-text2">mg — Ratio 1mg/100UI | Max 50 mg/inj</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== CARDIOPLEGIE ==================== -->
+<div class="view" id="view-cardio">
+  <p class="text-medical-text2 text-[0.7rem] font-bold uppercase tracking-widest mb-2 text-center">Cardioplégie</p>
+
+  <!-- Classique -->
+  <div class="bg-white rounded-xl border border-medical-border shadow-sm mb-2 overflow-hidden">
+    <div class="px-3 py-1.5 bg-medical-primary/5 border-b border-medical-border/50 flex items-center gap-1.5">
+      <i class="ti ti-heart-off text-medical-accent text-sm"></i>
+      <span class="text-[0.78rem] font-semibold text-medical-primary">Classique 4:1</span>
+      <span class="ml-auto text-[0.6rem] text-medical-text2 bg-medical-input px-1.5 py-0.5 rounded-full">Sang/Cristalloïde</span>
+    </div>
+    <div class="p-2.5">
+      <div class="grid grid-cols-2 gap-1.5 mb-2">
+        <div><label class="text-[0.65rem] text-medical-text2 uppercase tracking-wider font-medium">Poids <span class="font-normal text-medical-inputBd">kg</span></label><input type="number" id="c-poids-clas" value="70" step="0.1" class="w-full bg-medical-input border border-medical-inputBd rounded px-2 py-1.5 text-[0.85rem] font-condensed font-medium outline-none focus:border-medical-accent min-h-[36px]"></div>
+        <div><label class="text-[0.65rem] text-medical-text2 uppercase tracking-wider font-medium">Type</label><select id="c-type-clas" class="w-full bg-medical-input border border-medical-inputBd rounded px-2 py-1.5 text-[0.85rem] font-condensed font-medium outline-none min-h-[36px]"><option value="ant">Antegrade</option><option value="retro">Rétrograde</option><option value="comb">Combinée</option></select></div>
+        <div><label class="text-[0.65rem] text-medical-text2 uppercase tracking-wider font-medium">Durée <span class="font-normal text-medical-inputBd">min</span></label><input type="number" id="c-duree-clas" value="60" class="w-full bg-medical-input border border-medical-inputBd rounded px-2 py-1.5 text-[0.85rem] font-condensed font-medium outline-none focus:border-medical-accent min-h-[36px]"></div>
+        <div><label class="text-[0.65rem] text-medical-text2 uppercase tracking-wider font-medium">Intervalle <span class="font-normal text-medical-inputBd">min</span></label><input type="number" id="c-interval" value="20" class="w-full bg-medical-input border border-medical-inputBd rounded px-2 py-1.5 text-[0.85rem] font-condensed font-medium outline-none focus:border-medical-accent min-h-[36px]"></div>
+      </div>
+      <button class="w-full bg-medical-primary text-white border-none rounded-lg px-2 py-1.5 text-[0.8rem] font-semibold cursor-pointer min-h-[36px] mb-2 active:bg-[#083d54]" onclick="calcCardioClas()">Calculer</button>
+      <div class="grid grid-cols-2 gap-1 mb-1">
+        <div class="bg-medical-input rounded-lg py-1.5 px-1 text-center border border-medical-border/30"><div class="font-condensed text-[1rem] font-bold text-medical-primary" id="r-indu-clas">--</div><div class="text-[0.55rem] text-medical-text2">Induction <span class="text-medical-inputBd">mL</span></div></div>
+        <div class="bg-medical-input rounded-lg py-1.5 px-1 text-center border border-medical-border/30"><div class="font-condensed text-[1rem] font-bold text-medical-primary" id="r-entret">--</div><div class="text-[0.55rem] text-medical-text2">Entretien <span class="text-medical-inputBd">mL</span></div></div>
+        <div class="bg-medical-input rounded-lg py-1.5 px-1 text-center border border-medical-border/30"><div class="font-condensed text-[1rem] font-bold text-medical-primary" id="r-nb-dose">--</div><div class="text-[0.55rem] text-medical-text2">Nb doses</div></div>
+        <div class="bg-medical-accent/10 rounded-lg py-1.5 px-1 text-center border border-medical-accent/20"><div class="font-condensed text-[1rem] font-bold text-medical-accent" id="r-vol-tot-clas">--</div><div class="text-[0.55rem] text-medical-text2">Total <span class="text-medical-inputBd">mL</span></div></div>
+      </div>
+      <div class="bg-medical-accent/10 rounded-lg py-1.5 text-center border border-medical-accent/20">
+        <div class="font-condensed text-[1.1rem] font-bold text-medical-accent leading-none" id="r-debit-cardio">--</div>
+        <div class="text-[0.55rem] text-medical-text2">mL/min — Débit: 150–300 | P. ant. max 80–100</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Del Nido -->
+  <div class="bg-white rounded-xl border border-medical-border shadow-sm mb-2 overflow-hidden">
+    <div class="px-3 py-1.5 bg-medical-primary/5 border-b border-medical-border/50 flex items-center gap-1.5">
+      <i class="ti ti-heart-rate-monitor text-medical-accent text-sm"></i>
+      <span class="text-[0.78rem] font-semibold text-medical-primary">Del Nido</span>
+      <span class="ml-auto text-[0.6rem] text-medical-text2 bg-medical-input px-1.5 py-0.5 rounded-full">1:4 sang:crista</span>
+    </div>
+    <div class="p-2.5">
+      <div class="grid grid-cols-2 gap-1.5 mb-2">
+        <div><label class="text-[0.65rem] text-medical-text2 uppercase tracking-wider font-medium">Poids <span class="font-normal text-medical-inputBd">kg</span></label><input type="number" id="c-poids-dn" value="70" step="0.1" class="w-full bg-medical-input border border-medical-inputBd rounded px-2 py-1.5 text-[0.85rem] font-condensed font-medium outline-none focus:border-medical-accent min-h-[36px]"></div>
+        <div><label class="text-[0.65rem] text-medical-text2 uppercase tracking-wider font-medium">Durée <span class="font-normal text-medical-inputBd">min</span></label><input type="number" id="c-duree-dn" value="60" class="w-full bg-medical-input border border-medical-inputBd rounded px-2 py-1.5 text-[0.85rem] font-condensed font-medium outline-none focus:border-medical-accent min-h-[36px]"></div>
+      </div>
+      <button class="w-full bg-medical-primary text-white border-none rounded-lg px-2 py-1.5 text-[0.8rem] font-semibold cursor-pointer min-h-[36px] mb-2 active:bg-[#083d54]" onclick="calcDelNido()">Calculer</button>
+      <div class="bg-medical-accent/10 rounded-lg py-2 text-center border border-medical-accent/20 mb-1">
+        <div class="font-condensed text-[1.4rem] font-bold text-medical-accent leading-none" id="r-vol-dn">--</div>
+        <div class="text-[0.6rem] text-medical-text2">mL total à préparer</div>
+      </div>
+      <div id="dn-composition"></div>
+      <div class="alert-box hidden rounded py-1.5 px-2 text-[0.7rem] font-medium border-l-3" id="alert-dn"></div>
+    </div>
+  </div>
+
+  <!-- Température -->
+  <div class="bg-white rounded-xl border border-medical-border shadow-sm mb-2 overflow-hidden">
+    <div class="px-3 py-1.5 bg-medical-primary/5 border-b border-medical-border/50 flex items-center gap-1.5">
+      <i class="ti ti-thermometer text-medical-accent text-sm"></i>
+      <span class="text-[0.78rem] font-semibold text-medical-primary">Température</span>
+    </div>
+    <div class="p-2.5">
+      <div class="mb-1">
+        <div class="flex items-center justify-between mb-0.5">
+          <label class="text-[0.65rem] text-medical-text2 uppercase tracking-wider font-medium">T° <span class="font-normal text-medical-inputBd">°C</span></label>
+          <span class="font-condensed font-bold text-medical-accent text-[0.85rem]" id="rv-temp-cp">4</span>
+        </div>
+        <input type="range" id="c-temp-cp" min="4" max="37" step="1" value="4" oninput="document.getElementById('rv-temp-cp').textContent=this.value;calcTempCP()" class="w-full">
+      </div>
+      <div class="bg-medical-accent/10 rounded-lg py-2 text-center border border-medical-accent/20">
+        <div class="font-condensed text-[1.2rem] font-bold text-medical-accent leading-none" id="r-temp-cp-val">Froide</div>
+        <div class="text-[0.6rem] text-medical-text2 mt-0.5" id="r-temp-cp-rec">4–10°C : Froide classique</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pédiatrique -->
+  <div class="bg-white rounded-xl border border-medical-border shadow-sm mb-2 overflow-hidden">
+    <div class="px-3 py-1.5 bg-medical-primary/5 border-b border-medical-border/50 flex items-center gap-1.5">
+      <i class="ti ti-baby-carriage text-medical-accent text-sm"></i>
+      <span class="text-[0.78rem] font-semibold text-medical-primary">Pédiatrique</span>
+      <span class="ml-auto text-[0.6rem] text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded-full font-semibold">&lt; 15 kg</span>
+    </div>
+    <div class="p-2.5">
+      <div class="grid grid-cols-2 gap-1.5 mb-2">
+        <div><label class="text-[0.65rem] text-medical-text2 uppercase tracking-wider font-medium">Poids <span class="font-normal text-medical-inputBd">kg</span></label><input type="number" id="c-poids-ped" value="8" step="0.1" class="w-full bg-medical-input border border-medical-inputBd rounded px-2 py-1.5 text-[0.85rem] font-condensed font-medium outline-none focus:border-medical-accent min-h-[36px]"></div>
+        <div><label class="text-[0.65rem] text-medical-text2 uppercase tracking-wider font-medium">Durée <span class="font-normal text-medical-inputBd">min</span></label><input type="number" id="c-duree-ped" value="45" class="w-full bg-medical-input border border-medical-inputBd rounded px-2 py-1.5 text-[0.85rem] font-condensed font-medium outline-none focus:border-medical-accent min-h-[36px]"></div>
+      </div>
+      <button class="w-full bg-medical-primary text-white border-none rounded-lg px-2 py-1.5 text-[0.8rem] font-semibold cursor-pointer min-h-[36px] mb-2 active:bg-[#083d54]" onclick="calcCardioPed()">Calculer</button>
+      <div class="grid grid-cols-2 gap-1">
+        <div class="bg-medical-input rounded-lg py-1.5 px-1 text-center border border-medical-border/30"><div class="font-condensed text-[1rem] font-bold text-medical-primary" id="r-indu-ped">--</div><div class="text-[0.55rem] text-medical-text2">Induction <span class="text-medical-inputBd">mL</span></div></div>
+        <div class="bg-medical-input rounded-lg py-1.5 px-1 text-center border border-medical-border/30"><div class="font-condensed text-[1rem] font-bold text-medical-primary" id="r-entret-ped">--</div><div class="text-[0.55rem] text-medical-text2">Entretien <span class="text-medical-inputBd">mL</span></div></div>
+        <div class="bg-medical-input rounded-lg py-1.5 px-1 text-center border border-medical-border/30"><div class="font-condensed text-[1rem] font-bold text-medical-primary" id="r-p-max-ped">--</div><div class="text-[0.55rem] text-medical-text2">P. ant. max <span class="text-medical-inputBd">mmHg</span></div></div>
+        <div class="bg-medical-accent/10 rounded-lg py-1.5 px-1 text-center border border-medical-accent/20"><div class="font-condensed text-[1rem] font-bold text-medical-accent" id="r-vol-tot-ped">--</div><div class="text-[0.55rem] text-medical-text2">Total <span class="text-medical-inputBd">mL</span></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== O2 / GAZ ==================== -->
+<div class="view" id="view-oxy">
+  <p class="text-medical-text2 text-[0.7rem] font-bold uppercase tracking-widest mb-2 text-center">O₂ & Gaz du Sang</p>
+
+  <!-- FGF -->
+  <div class="bg-white rounded-xl border border-medical-border shadow-sm mb-2 overflow-hidden">
+    <div class="px-3 py-1.5 bg-medical-primary/5 border-b border-medical-border/50 flex items-center gap-1.5">
+      <i class="ti ti-wind text-medical-accent text-sm"></i>
+      <span class="text-[0.78rem] font-semibold text-medical-primary">Débit Gaz Frais</span>
+      <span class="ml-auto text-[0.6rem] text-medical-text2 bg-medical-input px-1.5 py-0.5 rounded-full">FGF</span>
+    </div>
+    <div class="p-2.5">
+      <div class="grid grid-cols-2 gap-1.5 mb-2">
+        <div><label class="text-[0.65rem] text-medical-text2 uppercase tracking-wider font-medium">Débit CPB <span class="font-normal text-medical-inputBd">L/min</span></label><input type="number" id="o-debit" value="5" step="0.1" class="w-full bg-medical-input border border-medical-inputBd rounded px-2 py-1.5 text-[0.85rem] font-condensed font-medium outline-none focus:border-medical-accent min-h-[36px]"></div>
+        <div><label class="text-[0.65rem] text-medical-text2 uppercase tracking-wider font-medium">Poids <span class="font-normal text-medical-inputBd">kg</span></label><input type="number" id="o-poids-fgf" value="70" step="0.1" class="w-full bg-medical-input border border-medical-inputBd rounded px-2 py-1.5 text-[0.85rem] font-condensed font-medium outline-none focus:border-medical-accent min-h-[36px]"></div>
+        <div><label class="text-[0.65rem] text-medical-text2 uppercase tracking-wider font-medium">Hb <span class="font-normal text-medical-inputBd">g/dL</span></label><input type="number" id="o-hb-fgf" value="12" step="0.1" class="w-full bg-medical-input border border-medical-inputBd rounded px-2 py-1.5 text-[0.85rem] font-condensed font-medium outline-none focus:border-medical-accent min-h-[36px]"></div>
+        <div><label class="text-[0.65rem] text-medical-text2 uppercase tracking-wider font-medium">Hct <span class="font-normal text-medical-inputBd">%</span></label><input type="number" id="o-hct-fgf" value="30" step="0.1" class="w-full bg-medical-input border border-medical-inputBd rounded px-2 py-1.5 text-[0.85rem] font-condensed font-medium outline-none focus:border-medical-accent min-h-[36px]"></div>
+        <div><label class="text-[0.65rem] text-medical-text2 uppercase tracking-wider font-medium">PaO₂ <span class="font-normal text-medical-inputBd">mmHg</span></label><input type="number" id="o-pao2" value="300" class="w-full bg-medical-input border border-medical-inputBd rounded px-2 py-1.5 text-[0.85rem] font-condensed font-medium outline-none focus:border-medical-accent min-h-[36px]"></div>
+        <div><label class="text-[0.65rem] text-medical-text2 uppercase tracking-wider font-medium">FiO₂ <span class="font-normal text-medical-inputBd">%</span></label><input type="number" id="o-fio2" value="100" class="w-full bg-medical-input border border-medical-inputBd rounded px-2 py-1.5 text-[0.85rem] font-condensed font-medium outline-none focus:border-medical-accent min-h-[36px]"></div>
+      </div>
+      <button class="w-full bg-medical-primary text-white border-none rounded-lg px-2 py-1.5 text-[0.8rem] font-semibold cursor-pointer min-h-[36px] mb-2 active:bg-[#083d54]" onclick="calcFGF()">Calculer</button>
+      <div class="grid grid-cols-3 gap-1 text-center mb-1">
+        <div class="bg-medical-input rounded-lg py-1 px-0.5 border border-medical-border/30"><div class="font-condensed text-[0.85rem] font-bold text-medical-primary" id="r-fgf">--</div><div class="text-[0.5rem] text-medical-text2">FGF <span class="text-medical-inputBd">L/min</span></div></div>
+        <div class="bg-medical-input rounded-lg py-1 px-0.5 border border-medical-border/30"><div class="font-condensed text-[0.85rem] font-bold text-medical-primary" id="r-fgf-l">--</div><div class="text-[0.5rem] text-medical-text2">L/min/m²</div></div>
+        <div class="bg-medical-input rounded-lg py-1 px-0.5 border border-medical-border/30"><div class="font-condensed text-[0.85rem] font-bold text-medical-primary" id="r-fgf-ml">--</div><div class="text-[0.5rem] text-medical-text2">mL/kg/min</div></div>
+      </div>
+      <div class="alert-box hidden rounded py-1.5 px-2 text-[0.7rem] font-medium border-l-3" id="alert-fgf"></div>
+    </div>
+  </div>
+
+  <!-- Alpha-Stat / pH-Stat -->
+  <div class="bg-white rounded-xl border border-medical-border shadow-sm mb-2 overflow-hidden">
+    <div class="px-3 py-1.5 bg-medical-primary/5 border-b border-medical-border/50 flex items-center gap-1.5">
+      <i class="ti ti-test-pipe text-medical-accent text-sm"></i>
+      <span class="text-[0.78rem] font-semibold text-medical-primary">CO₂ / pH-Stat</span>
+    </div>
+    <div class="p-2.5">
+      <div class="mb-1">
+        <div class="flex items-center justify-between mb-0.5">
+          <label class="text-[0.65rem] text-medical-text2 uppercase tracking-wider font-medium">Temp <span class="font-normal text-medical-inputBd">°C</span></label>
+          <span class="font-condensed font-bold text-medical-accent text-[0.85rem]" id="rv-temp-oxy">37</span>
+        </div>
+        <input type="range" id="o-temp-oxy" min="18" max="37" step="1" value="37" oninput="document.getElementById('rv-temp-oxy').textContent=this.value;calcC02()" class="w-full">
+      </div>
+      <div class="bg-medical-accent/10 rounded-lg py-2 text-center border border-medical-accent/20">
+        <div class="font-condensed text-[1.4rem] font-bold text-medical-accent leading-none" id="r-stat-mode">--</div>
+        <div class="text-[0.6rem] text-medical-text2 mt-0.5" id="r-stat-rec">α-stat > 30°C | pH-stat < 30°C</div>
+      </div>
+      <div class="alert-box hidden rounded py-1.5 px-2 text-[0.7rem] font-medium border-l-3" id="alert-stat"></div>
+    </div>
+  </div>
+
+  <!-- VO₂ / EO₂ -->
+  <div class="bg-white rounded-xl border border-medical-border shadow-sm mb-2 overflow-hidden">
+    <div class="px-3 py-1.5 bg-medical-primary/5 border-b border-medical-border/50 flex items-center gap-1.5">
+      <i class="ti ti-lungs text-medical-accent text-sm"></i>
+      <span class="text-[0.78rem] font-semibold text-medical-primary">VO₂ & Consommation O₂</span>
+      <span class="ml-auto text-[0.6rem] text-medical-text2 bg-medical-input px-1.5 py-0.5 rounded-full">VO₂</span>
+    </div>
+    <div class="p-2.5">
+      <div class="grid grid-cols-2 gap-1.5 mb-2">
+        <div><label class="text-[0.65rem] text-medical-text2 uppercase tracking-wider font-medium">Débit <span class="font-normal text-medical-inputBd">L/min</span></label><input type="number" id="o-debit-vo2" value="5" step="0.1" class="w-full bg-medical-input border border-medical-inputBd rounded px-2 py-1.5 text-[0.85rem] font-condensed font-medium outline-none focus:border-medical-accent min-h-[36px]"></div>
+        <div><label class="text-[0.65rem] text-medical-text2 uppercase tracking-wider font-medium">Poids <span class="font-normal text-medical-inputBd">kg</span></label><input type="number" id="o-poids-vo2" value="70" step="0.1" class="w-full bg-medical-input border border-medical-inputBd rounded px-2 py-1.5 text-[0.85rem] font-condensed font-medium outline-none focus:border-medical-accent min-h-[36px]"></div>
+        <div><label class="text-[0.65rem] text-medical-text2 uppercase tracking-wider font-medium">Hb <span class="font-normal text-medical-inputBd">g/dL</span></label><input type="number" id="o-hb-vo2" value="12" step="0.1" class="w-full bg-medical-input border border-medical-inputBd rounded px-2 py-1.5 text-[0.85rem] font-condensed font-medium outline-none focus:border-medical-accent min-h-[36px]"></div>
+        <div><label class="text-[0.65rem] text-medical-text2 uppercase tracking-wider font-medium">Hct <span class="font-normal text-medical-inputBd">%</span></label><input type="number" id="o-hct-vo2" value="30" step="0.1" class="w-full bg-medical-input border border-medical-inputBd rounded px-2 py-1.5 text-[0.85rem] font-condensed font-medium outline-none focus:border-medical-accent min-h-[36px]"></div>
+        <div><label class="text-[0.65rem] text-medical-text2 uppercase tracking-wider font-medium">PaO₂ <span class="font-normal text-medical-inputBd">mmHg</span></label><input type="number" id="o-pao2-vo2" value="300" class="w-full bg-medical-input border border-medical-inputBd rounded px-2 py-1.5 text-[0.85rem] font-condensed font-medium outline-none focus:border-medical-accent min-h-[36px]"></div>
+        <div><label class="text-[0.65rem] text-medical-text2 uppercase tracking-wider font-medium">SvO₂ <span class="font-normal text-medical-inputBd">%</span></label><input type="number" id="o-svo2" value="65" class="w-full bg-medical-input border border-medical-inputBd rounded px-2 py-1.5 text-[0.85rem] font-condensed font-medium outline-none focus:border-medical-accent min-h-[36px]"></div>
+      </div>
+      <button class="w-full bg-medical-primary text-white border-none rounded-lg px-2 py-1.5 text-[0.8rem] font-semibold cursor-pointer min-h-[36px] mb-2 active:bg-[#083d54]" onclick="calcVO2()">Calculer</button>
+      <div class="grid grid-cols-2 gap-1 mb-1">
+        <div class="bg-medical-input rounded-lg py-1.5 px-1 text-center border border-medical-border/30"><div class="font-condensed text-[1rem] font-bold text-medical-primary" id="r-vo2">--</div><div class="text-[0.55rem] text-medical-text2">VO₂ <span class="text-medical-inputBd">mL/min</span></div></div>
+        <div class="bg-medical-input rounded-lg py-1.5 px-1 text-center border border-medical-border/30"><div class="font-condensed text-[1rem] font-bold text-medical-primary" id="r-vo2-l">--</div><div class="text-[0.55rem] text-medical-text2">VO₂ <span class="text-medical-inputBd">mL/min/m²</span></div></div>
+        <div class="bg-medical-accent/10 rounded-lg py-1.5 px-1 text-center border border-medical-accent/20"><div class="font-condensed text-[1rem] font-bold text-medical-accent" id="r-eo2">--</div><div class="text-[0.55rem] text-medical-text2">EO₂ <span class="text-medical-inputBd">%</span></div></div>
+        <div class="bg-medical-accent/10 rounded-lg py-1.5 px-1 text-center border border-medical-accent/20"><div class="font-condensed text-[1rem] font-bold text-medical-accent" id="r-cmro2">--</div><div class="text-[0.55rem] text-medical-text2">CMRO₂ <span class="text-medical-inputBd">mL/min</span></div></div>
+      </div>
+      <div class="alert-box hidden rounded py-1.5 px-2 text-[0.7rem] font-medium border-l-3" id="alert-vo2"></div>
+    </div>
+  </div>
+
+  <!-- Q hypo -->
+  <div class="bg-white rounded-xl border border-medical-border shadow-sm mb-2 overflow-hidden">
+    <div class="px-3 py-1.5 bg-medical-primary/5 border-b border-medical-border/50 flex items-center gap-1.5">
+      <i class="ti ti-alert-triangle text-amber-500 text-sm"></i>
+      <span class="text-[0.78rem] font-semibold text-medical-primary">Débit Critique</span>
+      <span class="ml-auto text-[0.6rem] text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded-full font-semibold">Alerte</span>
+    </div>
+    <div class="p-2.5">
+      <div class="grid grid-cols-2 gap-1.5 mb-2">
+        <div><label class="text-[0.65rem] text-medical-text2 uppercase tracking-wider font-medium">Poids <span class="font-normal text-medical-inputBd">kg</span></label><input type="number" id="o-poids-qh" value="70" step="0.1" class="w-full bg-medical-input border border-medical-inputBd rounded px-2 py-1.5 text-[0.85rem] font-condensed font-medium outline-none focus:border-medical-accent min-h-[36px]"></div>
+        <div><label class="text-[0.65rem] text-medical-text2 uppercase tracking-wider font-medium">Surface <span class="font-normal text-medical-inputBd">m²</span></label><input type="number" id="o-bsa-qh" value="1.85" step="0.01" class="w-full bg-medical-input border border-medical-inputBd rounded px-2 py-1.5 text-[0.85rem] font-condensed font-medium outline-none focus:border-medical-accent min-h-[36px]"></div>
+      </div>
+      <button class="w-full bg-medical-primary text-white border-none rounded-lg px-2 py-1.5 text-[0.8rem] font-semibold cursor-pointer min-h-[36px] mb-2 active:bg-[#083d54]" onclick="calcQHypo()">Calculer</button>
+      <div class="grid grid-cols-2 gap-1 mb-1">
+        <div class="bg-medical-input rounded-lg py-1.5 px-1 text-center border border-medical-border/30"><div class="font-condensed text-[1rem] font-bold text-medical-primary" id="r-qh-l">--</div><div class="text-[0.55rem] text-medical-text2">Q hypo <span class="text-medical-inputBd">L/min</span></div></div>
+        <div class="bg-medical-input rounded-lg py-1.5 px-1 text-center border border-medical-border/30"><div class="font-condensed text-[1rem] font-bold text-medical-primary" id="r-qh-ml">--</div><div class="text-[0.55rem] text-medical-text2">mL/kg/min</div></div>
+      </div>
+      <div class="alert-box hidden rounded py-1.5 px-2 text-[0.7rem] font-medium border-l-3" id="alert-qh"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== MODAL: Accès Rapide ==================== -->
+<div id="quick-modal" class="fixed inset-0 z-[55] hidden items-center justify-center bg-black/40">
+  <div class="bg-white rounded-2xl shadow-2xl w-[90%] max-w-[340px] overflow-hidden scale-95 opacity-0 transition-all" id="modal-content">
+    <div class="bg-medical-primary px-4 py-2.5 flex items-center justify-between">
+      <p class="text-[0.82rem] text-white font-semibold">Accès rapide</p>
+      <button class="w-8 h-8 flex items-center justify-center rounded-full bg-white/15 text-white cursor-pointer" onclick="closeQuick()"><i class="ti ti-x text-sm"></i></button>
+    </div>
+    <div class="p-3" id="quick-buttons"></div>
+  </div>
+</div>
+
+<!-- FAB -->
+<button class="fixed right-4 bottom-[4.5rem] w-12 h-12 rounded-full bg-medical-accent text-white border-none shadow-lg z-[50] flex items-center justify-center active:bg-[#00a3c0] active:scale-90 transition-all" id="fab" onclick="openQuick()">
+  <i class="ti ti-calculator text-lg"></i>
+</button>
+
+<!-- ==================== BOTTOM NAVIGATION ==================== -->
+<nav class="fixed bottom-0 left-0 right-0 z-[50] bg-white/95 backdrop-blur-xl border-t border-medical-border pb-[env(safe-area-inset-bottom)]">
+  <div class="grid grid-cols-5 max-w-[500px] mx-auto relative">
+    <div class="absolute top-0 h-[2px] bg-medical-accent transition-all w-[20%] rounded-full" id="nav-indicator"></div>
+    <button class="nav-btn active" data-view="view-accueil" onclick="switchView(this)">
+      <i class="ti ti-heart-rate-monitor"></i><span>Accueil</span>
+    </button>
+    <button class="nav-btn" data-view="view-hemo" onclick="switchView(this)">
+      <i class="ti ti-stethoscope"></i><span>Hémody.</span>
+    </button>
+    <button class="nav-btn" data-view="view-amor" onclick="switchView(this)">
+      <i class="ti ti-droplet-half"></i><span>Amorç.</span>
+    </button>
+    <button class="nav-btn" data-view="view-cardio" onclick="switchView(this)">
+      <i class="ti ti-heart-off"></i><span>Cardio.</span>
+    </button>
+    <button class="nav-btn" data-view="view-oxy" onclick="switchView(this)">
+      <i class="ti ti-wind"></i><span>O₂</span>
+    </button>
+  </div>
+</nav>
+
+<!-- ==================== TOAST ==================== -->
+<div id="toast" class="fixed top-16 left-1/2 -translate-x-1/2 z-[90] bg-medical-primary text-white px-3 py-2 rounded-lg shadow-lg text-[0.8rem] font-semibold hidden w-[90%] max-w-[360px]"></div>
+
+<!-- ==================== SERVICE WORKER ==================== -->
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js')
+      .then(r => console.log('SW: Registered', r.scope))
+      .catch(e => console.error('SW registration failed:', e));
+  });
+}
+</script>
+
+<!-- ==================== JS ==================== -->
+<script src="js/formulas.js"></script>
+<script src="js/app.js"></script>
+<script src="js/hemo.js"></script>
+<script src="js/amor.js"></script>
+<script src="js/cardio.js"></script>
+<script src="js/oxy.js"></script>
+
+</body>
+</html>
