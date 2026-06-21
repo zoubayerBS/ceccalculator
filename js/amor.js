@@ -5,7 +5,7 @@ function addSegment() {
   row.innerHTML = `
     <div class="flex-[1.5] min-w-0">
       <label class="text-[0.65rem] text-medical-text2 uppercase tracking-wider font-medium">Type</label>
-      <select class="seg-type w-full bg-medical-input border border-medical-inputBd rounded px-2 py-1.5 text-[0.85rem] font-condensed font-medium outline-none min-h-[36px]">
+      <select class="seg-type w-full border border-medical-inputBd rounded px-2 py-1.5 text-[0.85rem] font-condensed font-medium outline-none min-h-[36px]">
         <option>Oxygénateur</option><option>Réservoir veineux</option><option>Tubulures artérielles</option><option>Tubulures veineuses</option><option>Filtre artériel</option><option>Cardiotomie</option><option>Autre</option>
       </select>
     </div>
