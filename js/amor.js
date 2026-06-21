@@ -1,19 +1,23 @@
 // ===== SECTION 3: AMORCAGE =====
 function addSegment() {
   const row = document.createElement('div');
-  row.className = 'segment-row flex gap-1.5 items-end mb-1.5';
+  row.className = 'segment-row columns is-mobile is-gapless is-multiline mb-2';
   row.innerHTML = `
-    <div class="flex-[1.5] min-w-0">
-      <label class="text-[0.65rem] text-medical-text2 uppercase tracking-wider font-medium">Type</label>
-      <select class="seg-type w-full border border-medical-inputBd rounded px-2 py-1.5 text-[0.85rem] font-condensed font-medium outline-none min-h-[36px]">
-        <option>Oxygénateur</option><option>Réservoir veineux</option><option>Tubulures artérielles</option><option>Tubulures veineuses</option><option>Filtre artériel</option><option>Cardiotomie</option><option>Autre</option>
-      </select>
+    <div class="column is-5 pr-2">
+      <label class="label is-size-7 has-text-grey">Type</label>
+      <div class="control">
+        <div class="select is-small is-fullwidth"><select class="seg-type">
+          <option>Oxygénateur</option><option>Réservoir veineux</option><option>Tubulures artérielles</option><option>Tubulures veineuses</option><option>Filtre artériel</option><option>Cardiotomie</option><option>Autre</option>
+        </select></div>
+      </div>
     </div>
-    <div class="flex-1 min-w-0">
-      <label class="text-[0.65rem] text-medical-text2 uppercase tracking-wider font-medium">Vol <span class="font-normal text-medical-inputBd">mL</span></label>
-      <input type="number" class="seg-vol w-full bg-medical-input border border-medical-inputBd rounded px-2 py-1.5 text-[0.85rem] font-condensed font-medium outline-none min-h-[36px]" value="0">
+    <div class="column is-5 px-1">
+      <label class="label is-size-7 has-text-grey">Vol <span class="has-text-grey-light">mL</span></label>
+      <div class="control"><input type="number" class="seg-vol input is-small" value="0"></div>
     </div>
-    <button onclick="removeSegment(this)" title="Supprimer" class="seg-del">×</button>
+    <div class="column is-2">
+      <button onclick="removeSegment(this)" title="Supprimer" class="seg-del">×</button>
+    </div>
   `;
   $('segments-list').appendChild(row);
 }

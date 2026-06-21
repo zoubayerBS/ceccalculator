@@ -89,13 +89,17 @@ const RULES = {
 };
 
 function clearInvalid(el) {
-  el.classList.remove('border-red-500', 'bg-red-50');
+  el.classList.remove('is-danger');
   el.removeAttribute('title');
+  const parent = el.closest('.control') || el.closest('.select');
+  if (parent) parent.classList.remove('is-danger');
 }
 
 function markInvalid(el, msg) {
-  el.classList.add('border-red-500', 'bg-red-50');
+  el.classList.add('is-danger');
   el.setAttribute('title', msg);
+  const parent = el.closest('.control') || el.closest('.select');
+  if (parent) parent.classList.add('is-danger');
 }
 
 function validateFields(ids) {
@@ -143,26 +147,20 @@ const quickActions = [
 
 function openQuick() {
   const modal = document.getElementById('quick-modal');
-  const content = document.getElementById('modal-content');
   const container = document.getElementById('quick-buttons');
   container.innerHTML = quickActions.map(a =>
-    `<button class="w-full flex items-center gap-3 bg-medical-input border border-medical-border rounded-lg p-3 mb-2 min-h-[48px] active:bg-[#e2e8f0] transition-colors" onclick="closeQuick();switchViewBySection('${a.section}');setTimeout(()=>${a.fn},300)">
-      <i class="ti ${a.icon} text-medical-accent text-lg"></i>
-      <span class="text-[0.85rem] font-semibold text-medical-text">${a.label}</span>
-      <i class="ti ti-chevron-right text-medical-text2 text-sm ml-auto"></i>
+    `<button class="button is-light is-fullwidth mb-2" style="justify-content:flex-start" onclick="closeQuick();switchViewBySection('${a.section}');setTimeout(()=>${a.fn},300)">
+      <span class="icon has-text-info"><i class="ti ${a.icon}"></i></span>
+      <span class="has-text-weight-semibold">${a.label}</span>
+      <span class="icon is-small ml-auto"><i class="ti ti-chevron-right has-text-grey"></i></span>
     </button>`
   ).join('');
-  modal.classList.remove('hidden');
-  modal.classList.add('flex');
-  setTimeout(() => { content.style.transform = 'scale(1)'; content.style.opacity = '1'; }, 10);
+  modal.classList.add('is-active');
 }
 
 function closeQuick() {
   const modal = document.getElementById('quick-modal');
-  const content = document.getElementById('modal-content');
-  content.style.transform = 'scale(0.95)';
-  content.style.opacity = '0';
-  setTimeout(() => { modal.classList.add('hidden'); modal.classList.remove('flex'); }, 200);
+  modal.classList.remove('is-active');
 }
 
 function switchViewBySection(section) {
@@ -245,14 +243,15 @@ function updateAccueil() {
 // ===== TOAST =====
 function showToast(msg, isError) {
   const t = $('toast');
-  if (!t) return;
+  if (!t || !msg) return;
   t.textContent = msg;
-  t.className = isError
-    ? 'fixed top-16 left-1/2 -translate-x-1/2 z-[90] bg-red-600 text-white px-3 py-2 rounded-lg shadow-lg text-[0.8rem] font-semibold w-[90%] max-w-[360px] text-center'
-    : 'fixed top-16 left-1/2 -translate-x-1/2 z-[90] bg-medical-primary text-white px-3 py-2 rounded-lg shadow-lg text-[0.8rem] font-semibold w-[90%] max-w-[360px] text-center';
+  t.style.background = isError ? '#DC2626' : '#257953';
+  t.classList.remove('hidden');
+  t.style.animation = 'none';
+  t.offsetHeight;
   t.style.animation = 'toastIn .3s ease';
   clearTimeout(t._timer);
-  t._timer = setTimeout(() => { t.style.animation = ''; t.className += ' hidden'; }, 2500);
+  t._timer = setTimeout(() => { t.style.animation = ''; t.classList.add('hidden'); }, 2500);
 }
 
 // ===== EXPORT =====

@@ -39,14 +39,16 @@ function calcDelNido() {
   const lido = cristalloide * 0.013;
 
   $('dn-composition').innerHTML = `
-    <table class="w-full text-[0.7rem] mt-1 border-collapse">
-      <tr class="bg-medical-primary/10"><td class="py-0.5 px-1 font-semibold rounded-tl">Sang oxygéné</td><td class="py-0.5 px-1 text-right font-bold rounded-tr">${sang.toFixed(0)} mL</td></tr>
-      <tr><td class="py-0.5 px-1">NaCl 0.9%</td><td class="py-0.5 px-1 text-right">${nacl.toFixed(0)} mL</td></tr>
-      <tr><td class="py-0.5 px-1">Mannitol 20%</td><td class="py-0.5 px-1 text-right">${mannitol.toFixed(0)} mL</td></tr>
-      <tr><td class="py-0.5 px-1">MgSO₄ 50%</td><td class="py-0.5 px-1 text-right">${mgso4.toFixed(1)} mL</td></tr>
-      <tr><td class="py-0.5 px-1">NaHCO₃ 8.4%</td><td class="py-0.5 px-1 text-right">${nahco3.toFixed(1)} mL</td></tr>
-      <tr><td class="py-0.5 px-1">KCl 15%</td><td class="py-0.5 px-1 text-right">${kcl.toFixed(1)} mL</td></tr>
-      <tr><td class="py-0.5 px-1 rounded-bl">Lidocaïne 1%</td><td class="py-0.5 px-1 text-right rounded-br">${lido.toFixed(1)} mL</td></tr>
+    <table class="table is-fullwidth is-size-7 mt-1">
+      <tbody>
+        <tr class="has-background-primary-light"><td class="has-text-weight-semibold">Sang oxygéné</td><td class="has-text-right has-text-weight-bold">${sang.toFixed(0)} mL</td></tr>
+        <tr><td>NaCl 0.9%</td><td class="has-text-right">${nacl.toFixed(0)} mL</td></tr>
+        <tr><td>Mannitol 20%</td><td class="has-text-right">${mannitol.toFixed(0)} mL</td></tr>
+        <tr><td>MgSO₄ 50%</td><td class="has-text-right">${mgso4.toFixed(1)} mL</td></tr>
+        <tr><td>NaHCO₃ 8.4%</td><td class="has-text-right">${nahco3.toFixed(1)} mL</td></tr>
+        <tr><td>KCl 15%</td><td class="has-text-right">${kcl.toFixed(1)} mL</td></tr>
+        <tr><td>Lidocaïne 1%</td><td class="has-text-right">${lido.toFixed(1)} mL</td></tr>
+      </tbody>
     </table>`;
   saveHistory({section:'Del Nido', detail:`${vol} mL`});
   showToast('Del Nido calculé');
